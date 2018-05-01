@@ -1,11 +1,14 @@
 import json
 import re
 
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.apps import apps
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.translation import ungettext
 import requests
 
+from wagtail.admin import messages
 from wagtail.core.models import Page
 
 from wagtailimportexport.forms import ImportForm
@@ -22,7 +25,32 @@ def index(request):
             )
             r = requests.get(import_url)
             import_json = r.json()
-            return HttpResponse(repr(import_json), content_type='text/plain')
+            pages_by_original_path = {}
+            parent_page = form.cleaned_data['parent_page']
+            for (i, page_record) in enumerate(import_json['pages']):
+                model = apps.get_model(page_record['app_label'], page_record['model'])
+                page = model.from_serializable_data(page_record['content'], check_fks=True, strict_fks=False)
+                original_path = page.path
+                page.id = None
+                page.path = None
+                page.depth = None
+                page.numchild = 0
+                page.url_path = None
+                if i == 0:
+                    parent_page.add_child(instance=page)
+                else:
+                    parent_path = original_path[:-(Page.steplen)]
+                    pages_by_original_path[parent_path].add_child(instance=page)
+
+                pages_by_original_path[original_path] = page
+
+            page_count = len(import_json['pages'])
+            messages.success(request, ungettext(
+                "%(count)s page imported.",
+                "%(count)s pages imported.",
+                page_count) % {'count': page_count}
+            )
+            return redirect('wagtailadmin_explore', parent_page.pk)
     else:
         form = ImportForm()
 
@@ -40,7 +68,7 @@ def export(request, page_id, export_unpublished=False):
     except Page.DoesNotExist:
         return JsonResponse({'error': 'page not found'})
 
-    pages = Page.objects.descendant_of(root_page, inclusive=True).order_by('path')
+    pages = Page.objects.descendant_of(root_page, inclusive=True).order_by('path').specific()
     if not export_unpublished:
         pages = pages.filter(live=True)
 
