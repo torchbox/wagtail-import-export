@@ -1,3 +1,4 @@
+import json
 import re
 
 from django.http import JsonResponse
@@ -10,7 +11,7 @@ from wagtail.admin import messages
 from wagtail.core.models import Page
 
 from wagtailimportexport.exporting import export_pages
-from wagtailimportexport.forms import ExportForm, ImportForm
+from wagtailimportexport.forms import ExportForm, ImportFromAPIForm, ImportFromFileForm
 from wagtailimportexport.importing import import_pages
 
 
@@ -20,7 +21,7 @@ def index(request):
 
 def import_from_api(request):
     if request.method == 'POST':
-        form = ImportForm(request.POST)
+        form = ImportFromAPIForm(request.POST)
         if form.is_valid():
             # remove trailing slash from base url
             base_url = re.sub(r'\/$', '', form.cleaned_data['source_site_base_url'])
@@ -41,9 +42,33 @@ def import_from_api(request):
             )
             return redirect('wagtailadmin_explore', parent_page.pk)
     else:
-        form = ImportForm()
+        form = ImportFromAPIForm()
 
-    return render(request, 'wagtailimportexport/import.html', {
+    return render(request, 'wagtailimportexport/import_from_api.html', {
+        'form': form,
+    })
+
+
+def import_from_file(request):
+    if request.method == 'POST':
+        form = ImportFromFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            parent_page = form.cleaned_data['parent_page']
+            import_data = json.loads(form.cleaned_data['file'].read().decode('utf-8'))
+
+            page_count = import_pages(import_data, parent_page)
+
+            page_count = len(import_data['pages'])
+            messages.success(request, ungettext(
+                "%(count)s page imported.",
+                "%(count)s pages imported.",
+                page_count) % {'count': page_count}
+            )
+            return redirect('wagtailadmin_explore', parent_page.pk)
+    else:
+        form = ImportFromFileForm()
+
+    return render(request, 'wagtailimportexport/import_from_file.html', {
         'form': form,
     })
 
