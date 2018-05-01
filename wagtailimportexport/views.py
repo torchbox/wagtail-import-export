@@ -32,37 +32,34 @@ def index(request):
 
 
 def export(request, page_id, export_unpublished=False):
-
-    def page_json(page):
-        return {
-            'content': json.loads(page.to_json()),
-            'model': page.content_type.model,
-            'app_label': page.content_type.app_label,
-        }
-
-    def add_published_pages(page):
-        payload[page.id] = page_json(page)
-        for child_page in page.get_children().live():
-            add_published_pages(child_page)
-
     try:
-        page = Page.objects.get(id=page_id, live=True).specific
+        if export_unpublished:
+            root_page = Page.objects.get(id=page_id)
+        else:
+            root_page = Page.objects.get(id=page_id, live=True)
     except Page.DoesNotExist:
         return JsonResponse({'error': 'page not found'})
+
+    pages = Page.objects.descendant_of(root_page, inclusive=True).order_by('path')
+    if not export_unpublished:
+        pages = pages.filter(live=True)
+
+    page_data = []
+    exported_paths = set()
+    for (i, page) in enumerate(pages):
+        parent_path = page.path[:-(Page.steplen)]
+        # skip over pages whose parents haven't already been exported
+        # (which means that export_unpublished is false and the parent was unpublished)
+        if i == 0 or (parent_path in exported_paths):
+            page_data.append({
+                'content': json.loads(page.to_json()),
+                'model': page.content_type.model,
+                'app_label': page.content_type.app_label,
+            })
+            exported_paths.add(page.path)
+
     payload = {
-        'id': page.id
+        'pages': page_data
     }
-
-    if export_unpublished:
-
-        payload[page.id] = page_json(page)
-        for subpage in page.get_descendants():
-            payload[subpage.id] = page_json(subpage.specific)
-
-    else:
-
-        add_published_pages(page)
-
-    payload['count'] = len(payload) - 1
 
     return JsonResponse(payload)
