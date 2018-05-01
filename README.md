@@ -11,7 +11,7 @@ Now add to your project's `INSTALLED_APPS`:
 
     INSTALLED_APPS = [
         # ...
-        'wagtailimportexport'
+        'wagtailimportexport',
         # ...
     ]
 
