@@ -1,7 +1,10 @@
 import json
+import re
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
+import requests
 
 from wagtail.core.models import Page
 
@@ -12,7 +15,14 @@ def index(request):
     if request.method == 'POST':
         form = ImportForm(request.POST)
         if form.is_valid():
-            return HttpResponse('OK')
+            # remove trailing slash from base url
+            base_url = re.sub(r'\/$', '', form.cleaned_data['source_site_base_url'])
+            import_url = (
+                base_url + reverse('wagtailimportexport:export', args=[form.cleaned_data['source_page_id']])
+            )
+            r = requests.get(import_url)
+            import_json = r.json()
+            return HttpResponse(repr(import_json), content_type='text/plain')
     else:
         form = ImportForm()
 
