@@ -3,14 +3,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from wagtail.admin.menu import MenuItem
-from wagtailimportexport import urls
+from wagtailimportexport import admin_urls
 from wagtail.core import hooks
 
 
 @hooks.register('register_admin_urls')
 def register_admin_urls():
     return [
-        url(r'^import/', include(urls, namespace='wagtailimportexport')),
+        url(r'^import/', include(admin_urls, namespace='wagtailimportexport')),
     ]
 
 
