@@ -14,3 +14,10 @@ class ImportForm(forms.Form):
         label=_("Destination parent page"),
         help_text=_("Imported pages will be created as children of this page.")
     )
+
+
+class ExportForm(forms.Form):
+    root_page = forms.ModelChoiceField(
+        queryset=Page.objects.all(),
+        widget=AdminPageChooser(can_choose_root=True),
+    )

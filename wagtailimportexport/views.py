@@ -1,4 +1,3 @@
-import json
 import re
 
 from django.http import JsonResponse
@@ -11,11 +10,15 @@ from wagtail.admin import messages
 from wagtail.core.models import Page
 
 from wagtailimportexport.exporting import export_pages
-from wagtailimportexport.forms import ImportForm
+from wagtailimportexport.forms import ExportForm, ImportForm
 from wagtailimportexport.importing import import_pages
 
 
 def index(request):
+    return render(request, 'wagtailimportexport/index.html')
+
+
+def import_from_api(request):
     if request.method == 'POST':
         form = ImportForm(request.POST)
         if form.is_valid():
@@ -41,6 +44,22 @@ def index(request):
         form = ImportForm()
 
     return render(request, 'wagtailimportexport/import.html', {
+        'form': form,
+    })
+
+
+def export_to_file(request):
+    if request.method == 'POST':
+        form = ExportForm(request.POST)
+        if form.is_valid():
+            payload = export_pages(form.cleaned_data['root_page'], export_unpublished=True)
+            response = JsonResponse(payload)
+            response['Content-Disposition'] = 'attachment; filename="export.json"'
+            return response
+    else:
+        form = ExportForm()
+
+    return render(request, 'wagtailimportexport/export_to_file.html', {
         'form': form,
     })
 

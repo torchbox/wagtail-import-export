@@ -10,17 +10,17 @@ from wagtail.core import hooks
 @hooks.register('register_admin_urls')
 def register_admin_urls():
     return [
-        url(r'^import/', include(admin_urls, namespace='wagtailimportexport_admin')),
+        url(r'^import-export/', include(admin_urls, namespace='wagtailimportexport_admin')),
     ]
 
 
-class ImportMenuItem(MenuItem):
+class ImportExportMenuItem(MenuItem):
     def is_shown(self, request):
         return request.user.is_superuser
 
 
 @hooks.register('register_admin_menu_item')
-def register_import_menu_item():
-    return ImportMenuItem(
-        _('Import'), reverse('wagtailimportexport_admin:index'), classnames='icon icon-download', order=800
+def register_import_export_menu_item():
+    return ImportExportMenuItem(
+        _('Import / Export'), reverse('wagtailimportexport_admin:index'), classnames='icon icon-download', order=800
     )
