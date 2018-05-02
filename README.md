@@ -41,3 +41,14 @@ It is possible to export all pages under a source page by adding a setting on th
     WAGTAILIMPORTEXPORT_EXPORT_UNPUBLISHED = True
 
 This should *not* be used in a public source site because the API is unauthenticated and would thus expose unpublished content to anyone.
+
+
+## Limitations
+
+If the imported content includes any foreign keys to page models, these will be updated to reflect the new page IDs if the target page is also part of the import, or left unchanged otherwise. If the target page is neither part of the import nor does it already exist on the destination site, this is likely to fail with a database integrity error.
+
+Page references within rich text or StreamField content will not be rewritten to reflect new page IDs.
+
+Imports are processed in tree path order; first the base `Page` records are imported, followed by the data for specific page subclasses. If a model is imported which includes a foreign key to a specific subclass of `Page`, and the target page of that foreign key appears in the import but later in tree path order, this will fail with an integrity error (as the relevant record will not have been created at that point).
+
+Non-page data, such as images, documents or snippets, is not included in the import; the user is responsible for ensuring that any objects referenced from imported pages are already present on the destination site (with matching IDs).
