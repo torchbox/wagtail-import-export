@@ -3,6 +3,20 @@ from wagtail.core.models import Page
 
 
 def export_pages(root_page, export_unpublished=False):
+    """
+    Create a JSON defintion of part of a site's page tree starting
+    from root_page and descending into its descendants
+
+    By default only published pages are exported.
+
+    If a page is unpublished it and all its descendants are pruned even
+    if some of those descendants are themselves published. This ensures
+    that there are no orphan pages when the subtree is created in the
+    destination site.
+
+    If export_unpublished=True the root_page and all its descendants
+    are included.
+    """
     pages = Page.objects.descendant_of(root_page, inclusive=True).order_by('path').specific()
     if not export_unpublished:
         pages = pages.filter(live=True)

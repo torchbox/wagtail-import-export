@@ -21,6 +21,14 @@ def index(request):
 
 
 def import_from_api(request):
+    """
+    Import a part of a source site's page tree via a direct API request from
+    this Wagtail Admin to the source site
+
+    The source site's base url and the source page id of the point in the
+    tree to import defined what to import and the destination parent page
+    defines where to import it to.
+    """
     if request.method == 'POST':
         form = ImportFromAPIForm(request.POST)
         if form.is_valid():
@@ -51,6 +59,14 @@ def import_from_api(request):
 
 
 def import_from_file(request):
+    """
+    Import a part of a source site's page tree via an import of a JSON file
+    exported to a user's filesystem from the source site's Wagtail Admin
+
+    The source site's base url and the source page id of the point in the
+    tree to import defined what to import and the destination parent page
+    defines where to import it to.
+    """
     if request.method == 'POST':
         form = ImportFromFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -75,6 +91,11 @@ def import_from_file(request):
 
 
 def export_to_file(request):
+    """
+    Export a part of this source site's page tree to a JSON file
+    on this user's filesystem for subsequent import in a destination
+    site's Wagtail Admin
+    """
     if request.method == 'POST':
         form = ExportForm(request.POST)
         if form.is_valid():
@@ -91,6 +112,12 @@ def export_to_file(request):
 
 
 def export(request, page_id, export_unpublished=False):
+    """
+    API endpoint of this source site to export a part of the page tree
+    rooted at page_id
+
+    Requests are made by a destination site's import_from_api view.
+    """
     try:
         if export_unpublished:
             root_page = Page.objects.get(id=page_id)
