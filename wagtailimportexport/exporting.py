@@ -1,5 +1,9 @@
 import json
-from wagtail.core.models import Page
+
+try:
+    from wagtail.core.models import Page
+except ImportError:  # fallback for Wagtail <2.0
+    from wagtail.wagtailcore.models import Page
 
 
 def export_pages(root_page, export_unpublished=False):

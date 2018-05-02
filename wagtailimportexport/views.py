@@ -8,8 +8,12 @@ from django.utils.translation import ungettext, ugettext_lazy as _
 
 import requests
 
-from wagtail.admin import messages
-from wagtail.core.models import Page
+try:
+    from wagtail.admin import messages
+    from wagtail.core.models import Page
+except ImportError:  # fallback for Wagtail <2.0
+    from wagtail.wagtailadmin import messages
+    from wagtail.wagtailcore.models import Page
 
 from wagtailimportexport.exporting import export_pages
 from wagtailimportexport.forms import ExportForm, ImportFromAPIForm, ImportFromFileForm

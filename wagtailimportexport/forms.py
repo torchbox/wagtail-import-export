@@ -1,8 +1,12 @@
 from django import forms
 from django.utils.translation import ugettext as _
 
-from wagtail.admin.widgets import AdminPageChooser
-from wagtail.core.models import Page
+try:
+    from wagtail.admin.widgets import AdminPageChooser
+    from wagtail.core.models import Page
+except ImportError:  # fallback for Wagtail <2.0
+    from wagtail.wagtailadmin.widgets import AdminPageChooser
+    from wagtail.wagtailcore.models import Page
 
 
 class ImportFromAPIForm(forms.Form):
