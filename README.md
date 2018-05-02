@@ -34,7 +34,7 @@ You should now see an 'Import / Export' item in the Wagtail admin menu.
 
 ## Configuration
 
-By default only published pages are exported. If a descendant page is unpublished it and all its descendants are pruned (even if some of those descendants are themselves published).
+When importing via the API, only published pages are exported by default. If a descendant page is unpublished it and all its descendants are pruned (even if some of those descendants are themselves published).
 
 It is possible to export all pages under a source page by adding a setting on the source site:
 
