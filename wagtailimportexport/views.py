@@ -4,7 +4,8 @@ import re
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.translation import ungettext
+from django.utils.translation import ungettext, ugettext_lazy as _
+
 import requests
 
 from wagtail.admin import messages
@@ -96,7 +97,7 @@ def export(request, page_id, export_unpublished=False):
         else:
             root_page = Page.objects.get(id=page_id, live=True)
     except Page.DoesNotExist:
-        return JsonResponse({'error': 'page not found'})
+        return JsonResponse({'error': _('page not found')})
 
     payload = export_pages(root_page, export_unpublished=export_unpublished)
 
