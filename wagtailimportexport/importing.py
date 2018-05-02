@@ -1,8 +1,10 @@
 from django.apps import apps
+from django.db import transaction
 
 from wagtail.core.models import Page
 
 
+@transaction.atomic()
 def import_pages(import_data, parent_page):
     """
     Take a JSON export of part of a source site's page tree
@@ -14,7 +16,11 @@ def import_pages(import_data, parent_page):
         # The content type ID of the source page is not in general the same
         # between the source and destination sites but the page model needs
         # to exist on both.
-        model = apps.get_model(page_record['app_label'], page_record['model'])
+        # Raises LookupError exception if there is no matching model
+        try:
+            model = apps.get_model(page_record['app_label'], page_record['model'])
+        except LookupError as e:
+            raise e  # handle in import_from_api
         # Create a new page using the content of the source page but clear attributes
         # relating to the source page's position in the source tree.
         page = model.from_serializable_data(page_record['content'], check_fks=True, strict_fks=False)

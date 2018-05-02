@@ -41,14 +41,18 @@ def import_from_api(request):
             import_data = r.json()
             parent_page = form.cleaned_data['parent_page']
 
-            page_count = import_pages(import_data, parent_page)
-
-            page_count = len(import_data['pages'])
-            messages.success(request, ungettext(
-                "%(count)s page imported.",
-                "%(count)s pages imported.",
-                page_count) % {'count': page_count}
-            )
+            try:
+                page_count = import_pages(import_data, parent_page)
+            except LookupError as e:
+                messages.error(request, _(
+                    "Import failed: %(reason)s") % {'reason': e}
+                )
+            else:
+                messages.success(request, ungettext(
+                    "%(count)s page imported.",
+                    "%(count)s pages imported.",
+                    page_count) % {'count': page_count}
+                )
             return redirect('wagtailadmin_explore', parent_page.pk)
     else:
         form = ImportFromAPIForm()
@@ -70,17 +74,21 @@ def import_from_file(request):
     if request.method == 'POST':
         form = ImportFromFileForm(request.POST, request.FILES)
         if form.is_valid():
-            parent_page = form.cleaned_data['parent_page']
             import_data = json.loads(form.cleaned_data['file'].read().decode('utf-8'))
+            parent_page = form.cleaned_data['parent_page']
 
-            page_count = import_pages(import_data, parent_page)
-
-            page_count = len(import_data['pages'])
-            messages.success(request, ungettext(
-                "%(count)s page imported.",
-                "%(count)s pages imported.",
-                page_count) % {'count': page_count}
-            )
+            try:
+                page_count = import_pages(import_data, parent_page)
+            except LookupError as e:
+                messages.error(request, _(
+                    "Import failed: %(reason)s") % {'reason': e}
+                )
+            else:
+                messages.success(request, ungettext(
+                    "%(count)s page imported.",
+                    "%(count)s pages imported.",
+                    page_count) % {'count': page_count}
+                )
             return redirect('wagtailadmin_explore', parent_page.pk)
     else:
         form = ImportFromFileForm()
