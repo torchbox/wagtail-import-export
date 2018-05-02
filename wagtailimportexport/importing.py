@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
+from django.db import models, transaction
+from modelcluster.models import get_all_child_relations
 
 try:
     from wagtail.core.models import Page
@@ -55,11 +56,37 @@ def import_pages(import_data, parent_page):
         # Raises LookupError exception if there is no matching model
         model = apps.get_model(page_record['app_label'], page_record['model'])
 
-        specific_page = model.from_serializable_data(page_record['content'], check_fks=True, strict_fks=False)
+        specific_page = model.from_serializable_data(page_record['content'], check_fks=False, strict_fks=False)
         base_page = pages_by_original_id[specific_page.id]
         specific_page.page_ptr = base_page
         specific_page.__dict__.update(base_page.__dict__)
         specific_page.content_type = ContentType.objects.get_for_model(model)
+        update_page_references(specific_page, pages_by_original_id)
         specific_page.save()
 
     return len(import_data['pages'])
+
+
+def update_page_references(model, pages_by_original_id):
+    for field in model._meta.get_fields():
+        if isinstance(field, models.ForeignKey) and issubclass(field.related_model, Page):
+            linked_page_id = getattr(model, field.attname)
+            try:
+                # see if the linked page is one of the ones we're importing
+                linked_page = pages_by_original_id[linked_page_id]
+            except KeyError:
+                # any references to pages outside of the import should be left unchanged
+                continue
+
+            # update fk to the linked page's new ID
+            setattr(model, field.attname, linked_page.id)
+
+    # update references within inline child models, including the ParentalKey pointing back
+    # to the page
+    for rel in get_all_child_relations(model):
+        for child in getattr(model, rel.name).all():
+            # reset the child model's PK so that it will be inserted as a new record
+            # rather than updating an existing one
+            child.pk = None
+            # update page references on the child model, including the ParentalKey
+            update_page_references(child, pages_by_original_id)
