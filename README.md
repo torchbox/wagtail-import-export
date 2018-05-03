@@ -7,9 +7,7 @@ The destination site should have the same page models as the source site, with c
 
 ## Installation
 
-Check out this repo somewhere alongside a Wagtail project. From the root of the repo, run:
-
-    pip install -e .
+    pip install wagtail-import-export
 
 Now add to your project's `INSTALLED_APPS`:
 
