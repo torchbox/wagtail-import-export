@@ -78,7 +78,7 @@ def import_from_file(request):
     if request.method == 'POST':
         form = ImportFromFileForm(request.POST, request.FILES)
         if form.is_valid():
-            import_data = json.loads(form.cleaned_data['file'].read().decode('utf-8'))
+            import_data = json.loads(form.cleaned_data['file'].read().decode('utf-8-sig'))
             parent_page = form.cleaned_data['parent_page']
 
             try:
