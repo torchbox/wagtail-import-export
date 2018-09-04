@@ -1,18 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 
-
-WAGTAIL_VERSION_2_OR_GREATER = True
-
-
-try:
-    from wagtail.admin.widgets import AdminPageChooser
-    from wagtail.core.models import Page
-except ImportError:  # fallback for Wagtail <2.0
-    from wagtail.wagtailadmin.widgets import AdminPageChooser
-    from wagtail.wagtailcore.models import Page
-
-    WAGTAIL_VERSION_2_OR_GREATER = False
+from wagtailimportexport.compat import AdminPageChooser, Page, WAGTAIL_VERSION_2_OR_GREATER
 
 
 admin_page_params = {
