@@ -3,10 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from modelcluster.models import get_all_child_relations
 
-try:
-    from wagtail.core.models import Page
-except ImportError:  # fallback for Wagtail <2.0
-    from wagtail.wagtailcore.models import Page
+from wagtailimportexport.compat import Page
 
 
 @transaction.atomic()
