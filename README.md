@@ -27,6 +27,8 @@ Add the following to your project's urls.py (note that the `include(wagtailimpor
         url(r'', include(wagtail_urls)),
     ]
 
+(`wagtailimportexport.urls` contains the export API endpoint. The admin urls are in `wagtailimportexport.admin_urls` and
+are automatically registered.)
 
 You should now see an 'Import / Export' item in the Wagtail admin menu.
 

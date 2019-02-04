@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wagtail-import-export',
-    version='0.1',
+    version='0.2',
     description="Page export from one Wagtail instance into another",
     author='Torchbox and NHS Digital',
     author_email='hello@torchbox.com',
@@ -15,7 +15,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',

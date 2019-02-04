@@ -1,0 +1,18 @@
+Changelog
+=========
+
+0.2 (04.02.2019)
+~~~~~~~~~~~~~~~~
+
+ * Remove superfluous "Edit This Page" button (Neal Todd)
+ * Fix: Add form media to templates for Wagtail >= 2.3 compatibility (Neal Todd)
+ * Fix: Handle unspecified ParentalKey related_names (Andy Chosak)
+ * Centralise Wagtail 1 / 2 imports into a compat module (Sultan Iman)
+ * Fix: Decode utf-8-sig files (Rodolfo Lottin Pereira)
+ * Additional support for Wagtail < 2.0 (Rodolfo Lottin Pereira)
+
+
+0.1 (02.05.2018)
+~~~~~~~~~~~~~~~~~~~~
+
+ * Original release
