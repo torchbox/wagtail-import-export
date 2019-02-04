@@ -6,7 +6,10 @@ from wagtailimportexport.compat import AdminPageChooser, Page, WAGTAIL_VERSION_2
 
 admin_page_params = {
     'can_choose_root': True,
+    'show_edit_link': False,
 }
+
+admin_page_export_params = admin_page_params.copy()
 
 if WAGTAIL_VERSION_2_OR_GREATER:
     admin_page_params['user_perms'] = 'copy_to'
@@ -36,5 +39,5 @@ class ImportFromFileForm(forms.Form):
 class ExportForm(forms.Form):
     root_page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
-        widget=AdminPageChooser(can_choose_root=True),
+        widget=AdminPageChooser(**admin_page_export_params),
     )
