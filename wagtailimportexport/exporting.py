@@ -60,7 +60,8 @@ def export_snippets():
     """
     snippet_data = {}
     for Model in SNIPPET_MODELS:
-        model_key = ':'.join([Model.__module__, Model.__name__])
+        module_name = Model.__module__.split('.')[0]
+        model_key = '.'.join([module_name, Model.__name__])  # for django.apps.apps.get_model(...)
         snippets = Model.objects.all()
         snippet_data[model_key] = [instance_to_data(snippet) for snippet in snippets]
     return snippet_data
