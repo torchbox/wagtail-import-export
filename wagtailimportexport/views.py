@@ -104,27 +104,26 @@ def import_from_file(request):
 
 def export_to_file(request):
     """
-    Export a part of this source site's page tree to a ZIP file
-    on this user's filesystem for subsequent import in a destination
-    site's Wagtail Admin
+    Export a part of this source site's page tree, along with all snippets 
+    and images, to a ZIP file on this user's filesystem for subsequent 
+    import in a destination site's Wagtail Admin
     """
     if request.method == 'POST':
         form = ExportForm(request.POST)
-        null_users = True
-        export_unpublished = True
         if form.is_valid():
-            content_data = {}
-            content_data['pages'] = export_pages(
-                root_page=form.cleaned_data['root_page'],
-                export_unpublished=export_unpublished,
-                null_users=null_users)
-            content_data['snippets'] = export_snippets()
-            content_data['images'] = export_image_data(null_users=null_users)
+            content_data = {
+                'pages': export_pages(
+                    root_page=form.cleaned_data['root_page'],
+                    export_unpublished=form.cleaned_data['export_unpublished'],
+                    null_users=form.cleaned_data['null_users'],
+                ),
+                'snippets': export_snippets(),
+                'images': export_image_data(null_users=form.cleaned_data['null_users']),
+            }
             filedata = zip_content(content_data)
             payload = io.BytesIO(filedata)
             response = FileResponse(payload)
-            response[
-                'Content-Disposition'] = 'attachment; filename="content.zip"'
+            response['Content-Disposition'] = 'attachment; filename="content.zip"'
             return response
     else:
         form = ExportForm()

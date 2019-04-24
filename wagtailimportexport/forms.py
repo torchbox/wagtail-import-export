@@ -41,3 +41,13 @@ class ExportForm(forms.Form):
         queryset=Page.objects.all(),
         widget=AdminPageChooser(**admin_page_export_params),
     )
+    export_unpublished = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text=_("If True, unpublished pages will be exported as well as published pages"),
+    )
+    null_users = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text=_("If True, user fields (owner in pages, *user_id in images) will be nulled"),
+    )
