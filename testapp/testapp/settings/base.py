@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'wagtail.core',
 
     'wagtailimportexport',
+    'testapp',
 
     'modelcluster',
     'taggit',
