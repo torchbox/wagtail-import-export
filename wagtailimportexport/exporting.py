@@ -7,6 +7,7 @@ from django.core.files.storage import get_storage_class
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.base import ModelState
 from django.db.models.fields.files import FieldFile
+from wagtail.core.blocks import StreamValue
 from wagtail.images import get_image_model
 from wagtail.snippets.models import SNIPPET_MODELS
 from wagtailimportexport.compat import Page
@@ -85,6 +86,8 @@ def instance_to_data(instance, null_users=False):
             continue
         elif null_users == True and ('user_id' in key or 'owner' in key):
             data[key] = None
+        elif isinstance(value, StreamValue):
+            data[key] = json.dumps(value.stream_data, cls=DjangoJSONEncoder)
         elif isinstance(value, FieldFile) or isinstance(value, File):
             data[key] = {'name': value.name, 'size': value.size}
         else:
