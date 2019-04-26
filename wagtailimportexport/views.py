@@ -124,6 +124,7 @@ def export_to_file(request):
             payload = io.BytesIO(filedata)
             response = FileResponse(payload)
             response['Content-Disposition'] = 'attachment; filename="content.zip"'
+            response.content_type = 'application/zip'
             return response
     else:
         form = ExportForm()
