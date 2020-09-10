@@ -1,3 +1,10 @@
+:warning: **This project is no longer maintained.**
+
+For an up-to-date and more powerful solution, please consider https://github.com/wagtail/wagtail-transfer
+
+
+
+
 # wagtail-import-export
 Page export from one Wagtail instance into another.
 
